@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: discord-vending-bot
-    runtime: node
-    buildCommand: npm install
-    startCommand: npm start
-    healthCheckPath: /health
