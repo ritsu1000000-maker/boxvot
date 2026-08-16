@@ -30,11 +30,11 @@ delay = MIN_DELAY
 
 while not STOPPING:
     started = time.monotonic()
-    print("[watchdog] starting runner.py", flush=True)
+    print("[watchdog] starting runner_plus.py", flush=True)
 
     try:
         child = subprocess.Popen(
-            [sys.executable, "-u", "runner.py"],
+            [sys.executable, "-u", "runner_plus.py"],
             stdout=None,
             stderr=None,
         )
@@ -52,7 +52,7 @@ while not STOPPING:
         delay = MIN_DELAY
 
     print(
-        f"[watchdog] runner.py exited ({exit_code}) after {int(runtime)}s. "
+        f"[watchdog] runner_plus.py exited ({exit_code}) after {int(runtime)}s. "
         f"restart in {delay}s",
         flush=True,
     )
