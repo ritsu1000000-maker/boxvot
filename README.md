@@ -1,39 +1,60 @@
 # PayPayリンク式 Discord 自販機Bot
 
-## 購入者の流れ
+## 現在の構成
 
-1. 商品パネルの **「PayPayで購入する」** を押す
-2. PayPay受け取りリンクを入力
-3. Botがリンクの金額を確認
-4. 商品価格と違えばエラー
-5. 一致したら商品を購入者へ自動DM納品
-6. 管理者へ注文・自動納品済み通知を送信
+- `main.py` : 元のBot本体
+- `runner.py` : 0円・在庫数・スラッシュコマンド・ヘルスチェックを追加する実行版
+- `start.py` : `runner.py` が落ちたとき自動再起動するWatchdog
+- `render.yaml` : Render設定
+- `requirements.txt` : Python依存関係
+- `START.bat` : Windows起動用
 
-購入者はスラッシュコマンドを使いません。
+## 商品機能
+
+- 0円商品対応
+  - PayPayリンク不要
+  - 「無料で受け取る」ボタン
+  - DMへ自動納品
+- 1円以上
+  - PayPay受け取りリンクの金額確認
+  - 金額一致時にDMへ自動納品
+- 商品作成時に在庫数を指定
+- `-1` = 無限在庫
+- 無限在庫は販売パネルで `-` 表示
+- `/shopadmin stock_set` であとから在庫変更
 
 ## 管理者コマンド
 
 - `/shopadmin product_add`
 - `/shopadmin stock_add`
+- `/shopadmin stock_set`
 - `/shopadmin panel`
 - `/shopadmin orders`
 - `/shopadmin product_delete`
 
+購入者はスラッシュコマンドを使いません。
+
 ## Render
 
-### Build Command
+Build Command:
 
 ```text
 pip install -r requirements.txt
 ```
 
-### Start Command
+Start Command:
 
 ```text
-python main.py
+python -u start.py
 ```
 
-### Environment Variables
+Health Check Path:
+
+```text
+/health
+```
+
+Environment Variables:
 
 ```text
 DISCORD_TOKEN
@@ -43,31 +64,13 @@ ADMIN_CHANNEL_ID
 ```
 
 `ADMIN_CHANNEL_ID` は省略可能です。
-設定した場合、そのチャンネルへ購入通知を送ります。
-空欄の場合は `ADMIN_USER_ID` のDMへ送ります。
 
-PayPayの電話番号、パスワード、APIキーは不要です。
+## 自動復旧
 
-## 重要
+`start.py` が `runner.py` を監視します。Botプロセスが終了した場合、数秒待って自動再起動します。Discord側の一時切断にはdiscord.pyの再接続も使用します。
 
-このBotはPayPaythonの `link_check` を使ってリンクの公開情報から金額を確認します。
-PayPayへログインしたり、Botが自動で残高を受け取ったりはしません。
+## 注意
 
-PayPaython WebAPI版は非公式かつDiscontinued扱いのため、PayPay側の仕様変更で
-リンク金額チェックが動かなくなる可能性があります。その場合は購入処理を停止して
-「リンクの金額を確認できませんでした」と表示する設計です。
+PayPayリンクの金額一致だけでは、PayPay上で実際に残高を受け取ったことまでは証明できません。このBotはPayPayアカウントへログインしたり、残高を自動受取したりしません。
 
-## Renderのファイル保存
-
-`data/products.json`
-`data/orders.json`
-`data/uploads/`
-
-を使用します。Renderの通常の一時ファイルシステムでは再デプロイ等で消えるため、
-本番運用する場合はPersistent Disk等の永続ストレージを使用してください。
-
-
-## 自動納品について
-
-この版は、PayPayリンクから読み取れた金額が商品価格と一致した時点で自動納品します。
-PayPay上で管理者が実際に残高を受け取ったことまでは確認しません。
+Render Free Web Service自体のスピンダウンはBotコードだけでは防げません。また、Renderの一時ファイルシステムでは商品ファイルが再デプロイ等で消える場合があります。本番利用では永続ストレージを使用してください。
