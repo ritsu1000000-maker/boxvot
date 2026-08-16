@@ -1,6 +1,6 @@
-﻿@echo off
+@echo off
 chcp 65001 >nul
 cd /d "%~dp0"
 python -m pip install -r requirements.txt
-python main.py
+python -u start.py
 pause
