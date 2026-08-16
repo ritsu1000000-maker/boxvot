@@ -3,5 +3,6 @@ services:
     name: paypay-vending-bot
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: python -u start.py
     healthCheckPath: /health
+    maxShutdownDelaySeconds: 30
